@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from fastapi.params import Query, Path
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -26,22 +27,27 @@ users_dict = {
     }
 
 
-@router.get("/id")
-def get_user(id:int):
+@router.get("/all_users")
+def get_all_users(
+        q: str = Query(None, min_length=2, max_length=30)
+):
     global users_dict
-    user = users_dict[f'user_{id}']
+    return {
+        "all_users":users_dict,
+        "q":q
+    }
+
+
+@router.get("/{user_id}")
+def get_user(
+        user_id:int = Path(...,title="User id si", description="aniq kiriting", gt=0, le=100)
+
+):
+    global users_dict
+    user = users_dict[f'user_{user_id}']
     return {
         "User": user
         }
-
-
-@router.get("/all_users")
-def get_all_users():
-    global users_dict
-    return {
-        "all_users":
-            users_dict
-    }
 
 
 class UserSchema(BaseModel):

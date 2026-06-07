@@ -1,4 +1,6 @@
 from fastapi import APIRouter
+from fastapi.params import Query
+from pydantic.v1.validators import pattern_validator
 
 router = APIRouter()
 
@@ -12,9 +14,20 @@ async def jobs_name():
     }
 
 @router.post("/create/{job_name}")
-async def create_job(job_name):
+async def create_job(job_name:str="ALI"):
     return {
         "id":2,
         "job_name": job_name,
         "message": "job muvaffaqiyart yaratildi"
+    }
+
+
+@router.get("/jobs/")
+async def read_jobs(
+        category:str = Query("Backend", pattern="^Back$", alias="h!@#$%^&ufu", description='aaaaaaaaaaaa', title='aaaaaaaaaaaaaaaaaaaaaaaaaa'),
+        limit: int=10
+):
+    return {
+        "category":category,
+        "limit":limit
     }
