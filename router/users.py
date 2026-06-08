@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from fastapi.params import Query, Path
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 router = APIRouter()
 
@@ -27,6 +27,13 @@ users_dict = {
     }
 
 
+
+
+class User(BaseModel):
+    name: str = Field(...,min_length=3, description="Kamida 3 xarfdan iborat bo'lishi shart",title="Mih=joz ismi")
+    job: str = Field(...,min_length=2, title="Mijos kasbi", description="Iltimos kasbingizni kiriting")
+
+
 @router.get("/all_users")
 def get_all_users(
         q: str = Query(None, min_length=2, max_length=30)
@@ -50,13 +57,9 @@ def get_user(
         }
 
 
-class UserSchema(BaseModel):
-    Name: str
-    job: str
-
 
 @router.post('/add_user')
-def add_user(info:UserSchema):
+def add_user(info:User):
     global users_dict
     last_id = int(list(users_dict.values())[-1]['id'])
     new_id = last_id + 1
