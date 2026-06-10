@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-    from fastapi.params import Query
+from fastapi.params import Query
 from pydantic import BaseModel, Field, SecretStr, EmailStr, ConfigDict, field_validator
 from typing import Optional, Annotated
 from .users import User
