@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from router import api_router
+from fastapi.responses import RedirectResponse
 
 app = FastAPI(
     title="ALI API",
@@ -7,7 +8,12 @@ app = FastAPI(
     version="0.0.1"
 )
 
+@app.get("/", include_in_schema=False)
+async def redirect_to_docs():
+    return RedirectResponse(url='/docs')
+
 app.include_router(api_router, prefix="/api/v1")
+
 
 
 @app.options("/kopaytma/{son1}/{son2}", tags=["math"])
