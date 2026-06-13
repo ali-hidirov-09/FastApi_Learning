@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from router import api_router
+from router import api_router, NegativeSalaryError, my_handler
 from fastapi.responses import RedirectResponse
 
 app = FastAPI(
@@ -12,6 +12,7 @@ app = FastAPI(
 async def redirect_to_docs():
     return RedirectResponse(url='/docs')
 
+app.add_exception_handler(NegativeSalaryError, my_handler)
 app.include_router(api_router, prefix="/api/v1")
 
 
