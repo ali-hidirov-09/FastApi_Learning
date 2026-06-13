@@ -1,11 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request, status
 from fastapi.params import Query
-from pydantic import BaseModel, Field, SecretStr, EmailStr, ConfigDict, field_validator
+from pydantic import BaseModel, Field, SecretStr, EmailStr, ConfigDict, field_validator, model_validator
 from typing import Optional, Annotated
 from .users import User
 from pydantic.alias_generators import to_camel
 from fastapi.responses import JSONResponse
-
 router = APIRouter()
 
 PositiveInt = Annotated[int, Field(gt=0)]
@@ -17,12 +16,68 @@ class BaseSchema(BaseModel):
         populate_by_name=True,
         extra='forbid'
     )
+#---------------------------------------------------------Dars_7------------------------------------------------------------------
+class NegativeSalaryError(Exception):
+    def __init__(self, name:str):
+        self.name = name
+
+
+async def my_handler(request: Request, exc:NegativeSalaryError):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={"message": f"{exc.name}"}
+    )
+
+class Calculate(BaseSchema):
+    salary: float
+
+
+@router.post("/calculate-tax")
+async def calculate(calculate: Calculate):
+    data = calculate.model_dump()
+    if data['salary'] < 500:
+        raise NegativeSalaryError(name="Maosh manfiy bo'lishi mumkin emas, bu qullik davri emas!")
+    return data
+
+
+#---------------------------------------------------------Dars_6------------------------------------------------------------------
 
 
 
+password = Annotated[str, Field(min_length=8, max_length=50)]
+
+class Account(BaseSchema):
+    password: password
+    confirm_password: password
+    salary_min: float = Field(ge=500)
+    salary_max: float = Field(ge=500.0)
+
+    @model_validator(mode='after')
+    def check_passwords(self):
+        if self.password != self.confirm_password:
+            raise ValueError("Parollar bir biriga mos kelamydi")
+        return self
 
 
+    @model_validator(mode='after')
+    def check_salaries(self):
+        if self.salary_min > self.salary_max:
+            raise ValueError("salary_min salary_max dan katta bo'lishi mumkin emas")
+        return self
 
+
+MinStr = Annotated[str, Field(min_length=3)]
+phoneNuber = Annotated[str, Field(pattern=r"^\+998\d{9}$")]
+aaa = Annotated[str, Field(pattern=r"^admin-\d{2}-\w{5}-\s+$")]
+class User1(BaseSchema):
+    username: MinStr
+    phone_number: phoneNuber
+    a: aaa
+
+@router.post("/get_post", response_model=User1)
+async def post_get(user:User1):
+    user_data = user.model_dump()
+    return user_data
 
 #---------------------------------------------------------Dars_5------------------------------------------------------------------
 
