@@ -1,6 +1,11 @@
 from fastapi import FastAPI
 from router import api_router, NegativeSalaryError, my_handler
 from fastapi.responses import RedirectResponse
+from database import Base, engine
+import models
+
+Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI(
     title="ALI API",
