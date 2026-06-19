@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Request, status
-from fastapi.params import Query
+from fastapi.params import Query, Depends
 from pydantic import BaseModel, Field, SecretStr, EmailStr, ConfigDict, field_validator, model_validator
 from typing import Optional, Annotated
 from .users import User
 from pydantic.alias_generators import to_camel
 from fastapi.responses import JSONResponse
+from database import AsyncSession, get_async_session
 router = APIRouter()
 
 PositiveInt = Annotated[int, Field(gt=0)]
@@ -16,6 +17,14 @@ class BaseSchema(BaseModel):
         populate_by_name=True,
         extra='forbid'
     )
+
+#---------------------------------------------------------Dars_9------------------------------------------------------------------
+@router.get("/job_id")
+async def read_job(db: AsyncSession = Depends(get_async_session)):
+    print(db)
+    return {"message": "muvaffaqiyatli ishladi"}
+
+
 #---------------------------------------------------------Dars_7------------------------------------------------------------------
 class NegativeSalaryError(Exception):
     def __init__(self, name:str):
