@@ -4,7 +4,9 @@ from fastapi.responses import RedirectResponse
 from database import Base, engine
 import models
 
-Base.metadata.create_all(bind=engine)
+async def init_models():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 
 app = FastAPI(
