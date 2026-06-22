@@ -2,16 +2,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from router import api_router, NegativeSalaryError, my_handler
 from fastapi.responses import RedirectResponse
-from database import Base, engine
-import models
+
 
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Dastur ishga tushganda (startup) jadvallarni yaratadi
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
     yield
 
 app = FastAPI(
