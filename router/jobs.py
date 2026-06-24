@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Request, status, HTTPException
 from fastapi.params import Query, Depends
 from pydantic import BaseModel, Field, SecretStr, EmailStr, ConfigDict, field_validator, model_validator
-from typing import Optional, Annotated
+from typing import Annotated
 from .users import User
 from pydantic.alias_generators import to_camel
 from fastapi.responses import JSONResponse
-from database import AsyncSession, get_async_session
+from core.database import AsyncSession, get_async_session
+from fastapi.security import OAuth2PasswordRequestForm
+from core.security import create_access_token, hasher
 router = APIRouter()
 
 PositiveInt = Annotated[int, Field(gt=0)]
@@ -18,11 +20,35 @@ class BaseSchema(BaseModel):
         extra='forbid'
     )
 
+
+#---------------------------------------------------------Dars_13------------------------------------------------------------------
+
+@router.post("/login")
+def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    db_user = {
+        "username": "ali@gmail.com",
+        "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$ilGq9d6b07r3/h/DWAsBQA$tht1dcFI8hh0FSNFDnUV42VLNgLj2jWkmLs8D/ci4+I"  # Bu 'password123' ning hashi
+    }
+
+    user_hashed_password = db_user['hashed_password']
+
+    if not hasher.verify_password(form_data.password, user_hashed_password):
+        raise HTTPException(401, detail="username yoki parol xato")
+
+    return create_access_token(data={"sub": db_user['username']})
+
+
+
+
+
+
+
 #---------------------------------------------------------Dars_9------------------------------------------------------------------
 @router.get("/job_id")
 async def read_job(db: AsyncSession = Depends(get_async_session)):
     print(db)
     return {"message": "muvaffaqiyatli ishladi"}
+
 
 
 #---------------------------------------------------------Dars_7------------------------------------------------------------------
