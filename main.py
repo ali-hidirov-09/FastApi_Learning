@@ -1,10 +1,11 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.security import OAuth2PasswordBearer
 from router import api_router, NegativeSalaryError, my_handler
 from fastapi.responses import RedirectResponse
 
 
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
