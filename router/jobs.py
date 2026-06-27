@@ -7,7 +7,7 @@ from pydantic.alias_generators import to_camel
 from fastapi.responses import JSONResponse
 from core.database import AsyncSession, get_async_session
 from fastapi.security import OAuth2PasswordRequestForm
-from core.security import create_access_token, hasher
+from core.security import create_access_token, Hasher
 router = APIRouter()
 
 PositiveInt = Annotated[int, Field(gt=0)]
@@ -23,7 +23,7 @@ class BaseSchema(BaseModel):
 
 #---------------------------------------------------------Dars_13------------------------------------------------------------------
 
-@router.post("/login")
+@router.post("/jlogin")
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
     db_user = {
         "username": "ali@gmail.com",
@@ -32,7 +32,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
     user_hashed_password = db_user['hashed_password']
 
-    if not hasher.verify_password(form_data.password, user_hashed_password):
+    if not Hasher.verify_password(form_data.password, user_hashed_password):
         raise HTTPException(401, detail="username yoki parol xato")
 
     return create_access_token(data={"sub": db_user['username']})
